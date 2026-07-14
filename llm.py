@@ -1,8 +1,11 @@
 import ollama#
-from config import AGENT_CONFIG, OLLAMA_HOST, OLLAMA_MODEL
+import time
+from config import AGENT_CONFIG, PROMPT_FORMAT, OLLAMA_MODEL, OLLAMA_HOST
+from vector_storage import VectorStore
+
 
 class Model:
-    def __init__(self, model_name: str = OLLAMA_MODEL, config: dict[str, any] = None, host: str = OLLAMA_HOST):
+    def __init__(self, vector_store: VectorStore, model_name: str = OLLAMA_MODEL, config: dict[str, any] = None, host: str = OLLAMA_HOST):
 
         self.model_name = model_name
         self.config = config or AGENT_CONFIG.copy()
@@ -17,6 +20,8 @@ class Model:
                 f"Model '{self.model_name}' not found. "
                 f"Run: ollama pull {self.model_name}"
             )
+        self.vector_store = vector_store
+        self.n_result = 5
 
     def _generation_options(self) -> dict[str, any]:
         return {
@@ -26,11 +31,31 @@ class Model:
             "top_k": self.config.get("top_k", 40),
         }
 
-    def generate(self, prompt: str, **kwargs) -> str:
+    def form_prompt(self, query: str) -> dict[str, any]:
+        n_results = self.n_result
+        results = self.vector_store.retriever([query], n_results)
+        retrieved_documents = results["documents"]
+        metadatas = results["metadatas"]#
+
+        context = " ".join(retrieved_documents)
+
+        prompt = PROMPT_FORMAT.format(context = context, question = query)
+
+        return{
+            "prompt": prompt,
+            "metadatas": metadatas,
+            "retrieved_documents": retrieved_documents,
+            "distances": results["distances"]
+        }
+
+
+    def generate(self, query: str, **kwargs) -> str:
+        start_time = time.time()
+        prompt = self.form_prompt(query)
         try:
             response = self.client.generate(
                 model=self.model_name,
-                prompt=prompt,
+                prompt=prompt["prompt"],
                 options=self._generation_options(),
                 **kwargs,
             )
@@ -39,8 +64,28 @@ class Model:
 
             if not text:
                 raise Exception("Empty response from model")
-            return text.strip()
+
+            time_spent = time.time() - start_time
+
+
+            for i in range(len(prompt["retrieved_documents"])):
+                document = prompt["retrieved_documents"][i]
+                metadatas = prompt["metadatas"][i]
+                distance = prompt["distances"][i]
+                print(f" --- №{i} --- ")
+                print(f"Source: {metadatas["source"]}")
+                print(f"Distance: {distance:.6}")
+                print(f"Text: {document}")
+
+            print(f"Time spent: {time_spent:.6} seconds")
+
         except Exception as e:
             raise Exception(f"Error generating response: {str(e)}")
+
+
+
+
+
+
 
 
