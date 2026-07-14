@@ -1,7 +1,6 @@
-from importlib.metadata import metadata
-from generator import Generator
 from knowledge_base import document_chunking
 from vector_storage import VectorStore
+from llm import Model
 
 def initialize_RAG():
     doc_folder = "docs"
@@ -12,18 +11,18 @@ def initialize_RAG():
 
         if not chunks:
             return None
-        texts = [c["text"] for c in chunks]
+        documents = [c["document"] for c in chunks]
         metadata = [c["metadatas"] for c in chunks]
 
-        vectore_store.add_document(texts, metadata)
-        print(f"Added {len(texts)} texts and {len(metadata)} metadata")
+        vectore_store.add_document(documents, metadata)
+        print(f"Added {len(documents)} texts and {len(metadata)} metadata")
 
-        RAG = Generator(vectore_store)
-        return RAG
+
+    return Model(vectore_store)
 
 def main():
-    RAG = initialize_RAG()
-    if RAG is None:
+    rag = initialize_RAG()
+    if rag is None:
         print(f"No documents in the folder")
         return
 
@@ -37,7 +36,7 @@ def main():
             if not query:
                 continue
 
-            result = RAG.generate(query)
+            result = rag.generate(query)
             print(f"\nAnswer: {result}")
 
         except KeyboardInterrupt:
