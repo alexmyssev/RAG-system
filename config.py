@@ -9,3 +9,6 @@ PROMPT_FORMAT = """
     Context: {context} 
     Question: {question} 
     """
+
+OLLAMA_MODEL = "llama3.1:8b"
+OLLAMA_HOST = "http://localhost:11434"
