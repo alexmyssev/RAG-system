@@ -40,7 +40,7 @@ class Model:
         context = " ".join(retrieved_documents)
         system_instruction = "Ты - ассистент, отвечающий на вопросы на основе данных, извлеченных из переданного контекста. Выводи ответ на русском языке. При  использовании информации из контекста, указывай, что информация взята из Википедии"
 
-        prompt = PROMPT_FORMAT.format(context = context, question = query)
+        prompt = PROMPT_FORMAT.format(system_instruction = system_instruction, context = context, question = query)
 
         return{
             "prompt": prompt,
