@@ -6,6 +6,7 @@ AGENT_CONFIG = {
 }
 
 PROMPT_FORMAT = """ 
+    System_instruction: {system_instruction}
     Context: {context} 
     Question: {question} 
     """
