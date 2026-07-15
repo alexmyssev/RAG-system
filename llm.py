@@ -80,6 +80,8 @@ class Model:
 
             print(f"Time spent: {time_spent:.6} seconds")
 
+            return text
+
         except Exception as e:
             raise Exception(f"Error generating response: {str(e)}")
 
