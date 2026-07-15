@@ -14,9 +14,13 @@ class VectorStore:
     def add_document(self, documents: list[str], metadatas: list[dict[str, any]]):
         if not documents:
             return
-        embeddings = self.embedding_function.encode(documents).tolist()
+        embeddings = self.embedding_function.encode(documents, batch_size=16, show_progress_bar=True).tolist()
         ids = [f"doc_{i}" for i in range(len(documents))]
-        self.collection.add(documents = documents, metadatas = metadatas, ids = ids, embeddings = embeddings)
+        max_batch_size = 5000
+        for i in range(0, len(documents), max_batch_size):
+            batch_end = i + max_batch_size
+            self.collection.add(documents=documents[i:batch_end], metadatas=metadatas[i:batch_end], ids=ids[i:batch_end], embeddings=embeddings[i:batch_end])
+            print(f"Добавлен батч {i}–{min(batch_end, len(documents))} из {len(documents)}")
 
     def retriever (self, query_texts: list[str], n_results: int) -> dict[str, Any]:
         query_embeddings = self.embedding_function.encode(query_texts).tolist()
