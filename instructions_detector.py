@@ -9,7 +9,6 @@ class Detector:
         self.model.to(DEVICE)
         self.model.eval()
         self.device = DEVICE
-        print(f"Модель детектора загружена и готова к работе.")
 
     def check(self, text: str) -> dict[str, any]:
         inputs = self.tokenizer(text, return_tensors="pt", truncation=True, max_length=512).to(self.device)
