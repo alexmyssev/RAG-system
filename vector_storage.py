@@ -26,7 +26,7 @@ class VectorStore:
         for i in range(0, len(documents), max_batch_size):
             batch_end = i + max_batch_size
             self.collection.add(documents=documents[i:batch_end], metadatas=metadatas[i:batch_end], ids=ids[i:batch_end], embeddings=embeddings[i:batch_end])
-            print(f"Добавлен батч {i}–{min(batch_end, len(documents))} из {len(documents)}")
+            print(f"Batch added {i}–{min(batch_end, len(documents))} из {len(documents)}")
 
     def retriever (self, query_text: str, n_results: int, full_access: bool) -> dict[str, any]:
         query_embeddings = self.embedding_function.encode(query_text).tolist()
