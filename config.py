@@ -6,10 +6,15 @@ AGENT_CONFIG = {
 }
 
 PROMPT_FORMAT = """ 
-    System_instruction: {system_instruction}
-    Context: {context} 
-    Question: {question} 
+    <system_instructions1> {system_instruction} </system_instructions1>
+    <untrusted> {context} </untrusted> 
+    <user_input> {question} </user_input> 
+    <system_instructions2> {system_instruction} </system_instructions2>
     """
 
 OLLAMA_MODEL = "llama3.1:8b"
 OLLAMA_HOST = "http://localhost:11434"
+PROMPT_GUARD_MODEL = "protectai/deberta-v3-base-prompt-injection-v2"
+DEVICE = "cpu"
+
+
