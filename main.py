@@ -2,7 +2,7 @@ from knowledge_base import document_chunking
 from vector_storage import VectorStore
 from llm import Model
 from authorization import Authorization
-#from instructions_detector import Detector
+from instructions_detector import Detector
 import os
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
@@ -26,7 +26,7 @@ def initialize_RAG():
 
 def main():
     rag = initialize_RAG()
-    #instructions_detector = Detector()
+    instructions_detector = Detector()
 
     if rag is None:
         print(f"No documents in the folder")
@@ -51,9 +51,9 @@ def main():
             if not query:
                 continue
 
-            #if instructions_detector.is_malicious(query):
-            #    print(f"Malicious query!")
-            #    continue
+            if instructions_detector.has_malicious_fragment(query):
+                print(f"Malicious query!")
+                continue
 
             result = rag.generate(query, full_access)
             print(f"\nAnswer: {result}")
