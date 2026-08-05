@@ -6,10 +6,9 @@ AGENT_CONFIG = {
 }
 
 PROMPT_FORMAT = """ 
-    <system_instructions1> {system_instruction} </system_instructions1>
+    <system_instructions> {system_instruction} </system_instructions>
     <untrusted> {context} </untrusted> 
     <user_input> {question} </user_input> 
-    <system_instructions2> {system_instruction} </system_instructions2>
     """
 
 OLLAMA_MODEL = "llama3.1:8b"
