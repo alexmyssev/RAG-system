@@ -1,6 +1,7 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from config import PROMPT_GUARD_MODEL, DEVICE
+import re
 
 class Detector:
     def __init__(self):
@@ -9,6 +10,7 @@ class Detector:
         self.model.to(DEVICE)
         self.model.eval()
         self.device = DEVICE
+
 
     def check(self, text: str) -> dict[str, any]:
         inputs = self.tokenizer(text, return_tensors="pt", truncation=True, max_length=512).to(self.device)
@@ -25,3 +27,13 @@ class Detector:
     def is_malicious(self, text: str) -> bool:
         result = self.check(text)
         return result["label"] != "SAFE" and result["confidence"] >= 0.9
+
+    def has_malicious_fragment(self, text: str) -> bool:
+        segments = re.split(r'[.!?\[\]()]+', text)
+        segments = [s.strip() for s in segments if s.strip()]
+
+        for segment in segments:
+            if self.is_malicious(segment):
+                return True
+
+        return False
