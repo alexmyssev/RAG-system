@@ -1,4 +1,5 @@
 import os
+import torch
 
 AGENT_CONFIG = {
     "temperature": 0.7,
@@ -20,7 +21,6 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 EMBEDDING_MODEL_PATH = "./models/qwen3-embedding"
 #PROMPT_GUARD_MODEL = "protectai/deberta-v3-base-prompt-injection-v2"
 PROMPT_GUARD_MODEL_PATH = "./models/deberta-prompt-injection"
-DEVICE = "cpu"
-
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
