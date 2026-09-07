@@ -11,8 +11,8 @@ def document_chunking(folder: str) -> list[dict[str,any]]:
 
     for filename in os.listdir(folder):
         if filename.endswith(".txt"):
-            with open(os.path.join(folder, filename), 'r', encoding="utf-8") as f:
-                text = f.read()
+            with open(os.path.join(folder, filename), 'r', encoding="utf-8") as file:
+                text = file.read()
                 chunks = chunk_text(text)
 
                 for i, chunk in enumerate(chunks):
@@ -33,4 +33,6 @@ def allowed_access(filename: str) -> str:
         return "confidential"
     else:
         return "not confidential"
+
+
 
