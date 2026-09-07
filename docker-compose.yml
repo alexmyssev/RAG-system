@@ -1,0 +1,41 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+  ollama-pull:
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["ollama", "pull", "${OLLAMA_MODEL:-llama3.1:8b}"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: "no"
+  rag-app:
+    build: .
+    container_name: rag-app
+    restart: unless-stopped
+    ports:
+      - "${RAG_APP_PORT:-8000}:8000"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.1:8b}
+    volumes:
+      - ./chroma_db:/app/chroma_db
+      - ./users.txt:/app/users.txt
+    depends_on:
+      ollama:
+        condition: service_healthy
+volumes:
+  ollama_data:
