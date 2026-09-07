@@ -1,6 +1,6 @@
 from chromadb import PersistentClient
 from sentence_transformers import SentenceTransformer
-from config import DEVICE
+from config import DEVICE, EMBEDDING_MODEL_PATH
 
 
 class VectorStore:
@@ -8,9 +8,8 @@ class VectorStore:
         self.name = "knowledge_base"
         self.client = PersistentClient(path="./chroma_db")
         self.collection = self.client.get_or_create_collection(name = self.name)
-        self.embedding_function = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B",  device=DEVICE, trust_remote_code=True)
-
-
+        #self.embedding_function = SentenceTransformer(EMBEDDING_MODEL,  device=DEVICE, trust_remote_code=True)
+        self.embedding_function = SentenceTransformer(EMBEDDING_MODEL_PATH, device=DEVICE, trust_remote_code=True)
 
     def add_document(self, documents: list[str], metadatas: list[dict[str, any]]):
         if not documents:
@@ -37,6 +36,9 @@ class VectorStore:
             "ids": results["ids"][0] if results["ids"] else None,
             "distances": results["distances"][0] if results["distances"] else None
         }
+
+
+
 
 
 
